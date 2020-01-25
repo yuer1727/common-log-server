@@ -112,8 +112,8 @@ impl SimpleSdkRequest{
     pub fn setDf(&mut self, df: String) {
         self.df = df
     }
-    pub fn getStartTime(&self) -> i64 {
-        return self.startTime
+    pub fn getStartTime(&self) -> &i64 {
+        return &(self.startTime)
     }
     pub fn setStartTime(&mut self, startTime: i64) {
         self.startTime = startTime

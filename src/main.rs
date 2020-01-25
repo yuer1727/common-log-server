@@ -37,8 +37,10 @@ fn clientDispatcher(
     };
 
     //body处理
-    let bodyData: Value = match serde_json::from_str(body.as_str()) {
-        Ok(bodyData) => bodyData,
+    let bodyData: Value = match serde_json::(body.as_str()) {
+        Ok(bodyData) => {
+            bodyData
+        },
         Err(error) => {
             return Err(format!("decode error, {:?} ", body));
 
@@ -48,7 +50,7 @@ fn clientDispatcher(
     //let response = SimpleSdkResponse::new_repsonse();
     //let result = serde_json::to_value(response)?;
 
-    return Ok(String::from("ddfd"));
+    return Ok();
 
 
 
