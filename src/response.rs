@@ -12,7 +12,7 @@ pub struct BaseState {
     code: i32,
     msg: String,
     desc: String,
-    subCode: i32,
+    sub_code: i32,
 
 }
 
@@ -22,7 +22,7 @@ impl BaseState{
             code: SUCCESS_CODE,
             msg: String::from(SUCCESS_MSG),
             desc: String::from(""),
-            subCode: SUCCESS_CODE,
+            sub_code: SUCCESS_CODE,
         }
     }
     pub fn new_state_with_param(code: i32, msg: String, desc: String) -> BaseState{
@@ -30,15 +30,15 @@ impl BaseState{
             code,
             msg,
             desc,
-            subCode: code,
+            sub_code: code,
         }
     }
-    pub fn new_state_with_all_param(code: i32, msg: String, desc: String, subCode: i32) -> BaseState{
+    pub fn new_state_with_all_param(code: i32, msg: String, desc: String, sub_code: i32) -> BaseState{
         BaseState{
             code,
             msg,
             desc,
-            subCode,
+            sub_code,
         }
     }
 }
@@ -69,12 +69,12 @@ impl SimpleSdkResponse{
         }
     }
 
-    pub fn setData(&mut self, dataMap: HashMap<String, Value>) {
-        self.data = dataMap;
+    pub fn set_data(&mut self, data_map: HashMap<String, Value>) {
+        self.data = data_map;
     }
 }
 
-pub fn responseInvalidParam(service_name: String, start_time: i64, state: BaseState) -> String {
+pub fn response_invalid_param(service_name: String, start_time: i64, state: BaseState) -> String {
     return String::new()
 }
 
