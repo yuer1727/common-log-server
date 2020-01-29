@@ -1,12 +1,31 @@
 use std::collections::HashMap;
 use serde_json::Value;
 use std::string::String;
+use crate::request::SimpleSdkRequest;
+use serde::{Deserialize, Serialize};
+
 
 static SUCCESS_CODE: i32 = 2000000;
 static SUCCESS_MSG: &'static str  = "操作成功";
+static INTERNAL_ERROR: &'static str = r#"{
+        "id": "default",
+        "state": {
+            "code": 5000000,
+            "msg": "内部错误",
+            "desc": "内部错误",
+            "sub_code": 5000000,
+        },
+
+        "data": {
+
+        }
+    })"#;
 
 
-#[derive(Clone)]
+
+
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct BaseState {
 
     code: i32,
@@ -43,7 +62,7 @@ impl BaseState{
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct SimpleSdkResponse {
 
     id: String,
@@ -74,7 +93,22 @@ impl SimpleSdkResponse{
     }
 }
 
-pub fn response_invalid_param(service_name: String, start_time: i64, state: BaseState) -> String {
-    return String::new()
+pub fn response_invalid_param(service_name: &String, start_time: u64, simple_sdk_request: Option<&SimpleSdkRequest>, state: BaseState) -> String {
+
+    let new_simple_sdk_request = &SimpleSdkRequest::new(start_time, service_name);;
+    let simple_sdk_request = simple_sdk_request.unwrap_or(new_simple_sdk_request);
+
+    let response = SimpleSdkResponse{
+        id: String::from(simple_sdk_request.get_id()),
+        state,
+        data: HashMap::new(),
+    };
+
+
+    let result = match serde_json::to_string(&response){
+        Ok(result) => result,
+        Err(error) => INTERNAL_ERROR.to_string(),
+    };
+    return result
 }
 

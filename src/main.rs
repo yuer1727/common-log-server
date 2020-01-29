@@ -13,11 +13,19 @@ use rocket::Response;
 use response::SimpleSdkResponse;
 use request::SimpleSdkRequest;
 use serde_json::Value;
+use crate::preprocessor_simple_sdk_client_json::processRequest;
+use rocket::request::FromRequest;
+use rocket::request::Outcome;
+use std::net::IpAddr;
+use crate::response::response_invalid_param;
+use crate::response::BaseState;
 
+mod preprocessor_simple_sdk_client_json;
 mod client_url;
 mod response;
 mod request;
 mod common_util;
+
 
 
 /**
@@ -30,28 +38,40 @@ https://stackoverflow.com/questions/54865824/return-json-with-an-http-status-oth
 fn client_dispatcher(
     service_name: String,
     body: String,
-    client_url: Option<Form<ClientUrl>>
+    client_url: Option<Form<ClientUrl>>,
+    http_request: RocketRequest,
 ) -> Result<String, String> {
 
+    let now: u64 = common_util::time_common::get_timestamp_millis();
+
     let client_url = match client_url {
-        None => return Err(format!("url param none")),
+        None => {
+            return Ok(response_invalid_param(&service_name,
+                                             now,
+                                             None,
+                                             BaseState::new_state_with_param(4000000, "异常请求".to_string(), "url参数缺失".to_string())));
+        },
         Some(client_url) => client_url,
     };
 
     //url校验
-    let client_url_params =  match client_url.validate(service_name) {
-        None => return Err(format!("url error, {:?} ", client_url)),
+    let client_url_params =  match client_url.validate(&service_name) {
+        None => {
+            return Ok(response_invalid_param(&service_name,
+                                             now,
+                                             None,
+                                             BaseState::new_state_with_param(4000000, "异常请求".to_string(), "url校验错误".to_string())));
+        },
         Some(client_url) => client_url,
     };
 
     //body处理
-    let request: SimpleSdkRequest = match serde_json::from_str(body.as_str()) {
+    let request = match processRequest(&service_name, &body, now, &http_request){
         Ok(request) => {
             request
         },
         Err(error) => {
             return Err(format!("decode error, {} ", body));
-
         },
     };
 
@@ -68,6 +88,35 @@ fn client_dispatcher(
 
 
 }
+
+
+
+pub struct RocketRequest{
+    remote_ip: String,
+    remote_port: u16,
+
+}
+
+impl<'a, 'r> FromRequest<'a, 'r> for RocketRequest {
+    type Error = ();
+
+    fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
+
+        let rocket_request = RocketRequest{
+            remote_ip: match request.real_ip(){
+                Some(ipAddr) => ipAddr.to_string(),
+                None => "".to_string(),
+            },
+            remote_port: match request.remote(){
+                Some(socketAddr) => socketAddr.port(),
+                None => 0,
+            }
+        };
+
+        Outcome::Success(rocket_request)
+    }
+}
+
 
 
 fn main() {

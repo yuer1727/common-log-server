@@ -33,11 +33,11 @@ lazy_static! {
 
 impl ClientUrl {
 
-    pub fn validate(&self, service_name: String) -> Option<ClientUrl> {
+    pub fn validate(&self, service_name: &String) -> Option<ClientUrl> {
 
         let client_url = ClientUrl{
             os: String::from(&self.os),
-            service: Some(service_name),
+            service: Some(service_name.clone()),
             ver: String::from(&self.ver),
             df: String::from(&self.df),
             cver: String::from(&self.cver),

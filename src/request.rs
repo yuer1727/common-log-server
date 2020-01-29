@@ -3,14 +3,16 @@ use serde_json::Value;
 use std::string::String;
 use serde::{Deserialize, Serialize};
 
-use crate::common_util::json_common::{default_str, default_i64};
+use crate::common_util::json_common::{default_str, default_u64};
+use crate::common_util::time_common::get_timestamp_millis;
 
 
 /**
 doc: https://serde.rs/
+https://stackoverflow.com/questions/19650265/is-there-a-faster-shorter-way-to-initialize-variables-in-a-rust-struct
 */
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Client {
     // 客户端版本
     ve: String,
@@ -30,6 +32,21 @@ pub struct Client {
     si: String,
     // 客户端扩展参数
     ex: HashMap<String, Value>,
+}
+
+
+impl Default for Client {
+    fn default() -> Client {
+        Client {
+            ve: "".to_string(),
+            os: "".to_string(),
+            fr: "".to_string(),
+            game_id: "".to_string(),
+            channel_id: "".to_string(),
+            si: "".to_string(),
+            ex: HashMap::new(),
+        }
+    }
 }
 
 impl Client{
@@ -60,7 +77,7 @@ impl Client{
 
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SimpleSdkRequest {
 
     //请求唯一标识
@@ -88,8 +105,8 @@ pub struct SimpleSdkRequest {
     #[serde(default = "default_str")]
     df: String,
     // 服务器接收到请求的时间 （服务端补齐参数）
-    #[serde(default = "default_i64")]
-    start_time: i64,
+    #[serde(default = "default_u64")]
+    start_time: u64,
     //请求urlParam
     #[serde(default = "default_str")]
     url_param: String,
@@ -97,12 +114,51 @@ pub struct SimpleSdkRequest {
 }
 
 
+impl Default for SimpleSdkRequest {
+    fn default() -> SimpleSdkRequest {
+        SimpleSdkRequest {
+            id: "".to_string(),
+            service: "".to_string(),
+            client: Default::default(),
+            data: HashMap::new(),
+            ver: "".to_string(),
+            ip: "".to_string(),
+            port: "".to_string(),
+            from: "".to_string(),
+            df: "".to_string(),
+            start_time: 0,
+            url_param: "".to_string(),
+        }
+    }
+}
+
 impl SimpleSdkRequest{
+
+    pub fn new(start_time: u64, service: &String) -> SimpleSdkRequest{
+        return SimpleSdkRequest{
+            id: format!("{}", start_time),
+            service: service.clone(),
+            ver: "1.0".to_string(),
+            df: "json".to_string(),
+            start_time: start_time,
+            client: Client{
+                ve: "1.0".to_string(),
+                ..Default::default()
+            },
+            ..Default::default()
+        }
+    }
+
+
+
     pub fn get_id(&self) -> &str {
         return self.id.as_str()
     }
     pub fn get_service(&self) -> &str {
         return self.service.as_str()
+    }
+    pub fn set_service(&mut self, service: String) {
+        self.service = service
     }
     pub fn get_client(&self) -> &Client {
         return &self.client
@@ -116,8 +172,14 @@ impl SimpleSdkRequest{
     pub fn get_ip(&self) -> &str {
         return self.ip.as_str()
     }
+    pub fn set_ip(&mut self, ip: String) {
+        self.ip = ip
+    }
     pub fn get_port(&self) -> &str {
         return self.port.as_str()
+    }
+    pub fn set_port(&mut self, port: String) {
+        self.port = port
     }
     pub fn get_from(&self) -> &str {
         return self.from.as_str()
@@ -131,10 +193,10 @@ impl SimpleSdkRequest{
     pub fn set_df(&mut self, df: String) {
         self.df = df
     }
-    pub fn get_start_time(&self) -> &i64 {
+    pub fn get_start_time(&self) -> &u64 {
         return &(self.start_time)
     }
-    pub fn set_start_time(&mut self, start_time: i64) {
+    pub fn set_start_time(&mut self, start_time: u64) {
         self.start_time = start_time
     }
     pub fn get_url_param(&self) -> &str {
