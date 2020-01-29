@@ -2,30 +2,24 @@
 
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate lazy_static;
-#[macro_use] extern crate rocket_contrib;
 
 use std::string::String;
 use rocket::request::Form;
 use crate::client_url::ClientUrl;
-use rocket::response::Responder;
 use rocket::Request;
-use rocket::Response;
-use response::SimpleSdkResponse;
-use request::SimpleSdkRequest;
-use serde_json::Value;
-use crate::preprocessor_simple_sdk_client_json::processRequest;
+use crate::preprocessor_simple_sdk_client_json::process_request;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;
-use std::net::IpAddr;
 use crate::response::response_invalid_param;
 use crate::response::BaseState;
+use bussiness_code::*;
 
 mod preprocessor_simple_sdk_client_json;
 mod client_url;
 mod response;
 mod request;
 mod common_util;
-
+mod bussiness_code;
 
 
 /**
@@ -49,7 +43,7 @@ fn client_dispatcher(
             return Ok(response_invalid_param(&service_name,
                                              now,
                                              None,
-                                             BaseState::new_state_with_param(4000000, "异常请求".to_string(), "url参数缺失".to_string())));
+                                             BaseState::new_state_with_param(ERROR_REQUEST_PARAMETERS.code, ERROR_REQUEST_PARAMETERS.msg, "url参数缺失")));
         },
         Some(client_url) => client_url,
     };
@@ -60,17 +54,17 @@ fn client_dispatcher(
             return Ok(response_invalid_param(&service_name,
                                              now,
                                              None,
-                                             BaseState::new_state_with_param(4000000, "异常请求".to_string(), "url校验错误".to_string())));
+                                             BaseState::new_state_with_param(ERROR_REQUEST_PARAMETERS.code, ERROR_REQUEST_PARAMETERS.msg, "url校验错误")));
         },
         Some(client_url) => client_url,
     };
 
     //body处理
-    let request = match processRequest(&service_name, &body, now, &http_request){
+    let request = match process_request(&service_name, &body, now, &http_request){
         Ok(request) => {
             request
         },
-        Err(error) => {
+        Err(_error) => {
             return Err(format!("decode error, {} ", body));
         },
     };
@@ -104,11 +98,11 @@ impl<'a, 'r> FromRequest<'a, 'r> for RocketRequest {
 
         let rocket_request = RocketRequest{
             remote_ip: match request.real_ip(){
-                Some(ipAddr) => ipAddr.to_string(),
+                Some(ip_addr) => ip_addr.to_string(),
                 None => "".to_string(),
             },
             remote_port: match request.remote(){
-                Some(socketAddr) => socketAddr.port(),
+                Some(socket_addr) => socket_addr.port(),
                 None => 0,
             }
         };

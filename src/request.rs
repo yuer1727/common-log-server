@@ -4,7 +4,6 @@ use std::string::String;
 use serde::{Deserialize, Serialize};
 
 use crate::common_util::json_common::{default_str, default_u64};
-use crate::common_util::time_common::get_timestamp_millis;
 
 
 /**

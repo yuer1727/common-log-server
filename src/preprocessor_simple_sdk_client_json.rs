@@ -1,16 +1,15 @@
 use crate::request::SimpleSdkRequest;
-use rocket::Request;
 use crate::RocketRequest;
 
 
-pub fn processRequest(server_name: &String, body: &String, start_time: u64, http_request: &RocketRequest) -> Result<SimpleSdkRequest, String> {
+pub fn process_request(server_name: &String, body: &String, start_time: u64, http_request: &RocketRequest) -> Result<SimpleSdkRequest, String> {
 
     //body反序列化
     let mut sdk_request: SimpleSdkRequest = match serde_json::from_str(body.as_str()) {
         Ok(request) => {
             request
         },
-        Err(error) => {
+        Err(_error) => {
             return Err(format!("decode error, {} ", body));
         },
     };
