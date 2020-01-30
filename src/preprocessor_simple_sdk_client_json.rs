@@ -1,5 +1,7 @@
 use crate::request::SimpleSdkRequest;
 use crate::RocketRequest;
+use crate::response::SimpleSdkResponse;
+use crate::simple_sdk_validator::validate;
 
 
 pub fn process_request(server_name: &String, body: &String, start_time: u64, http_request: &RocketRequest) -> Result<SimpleSdkRequest, String> {
@@ -24,3 +26,10 @@ pub fn process_request(server_name: &String, body: &String, start_time: u64, htt
     return Ok(sdk_request.clone())
 
 }
+
+pub fn processing(request: &SimpleSdkRequest, response: &mut SimpleSdkResponse) {
+
+    validate(request, response);
+}
+
+

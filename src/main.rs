@@ -7,19 +7,19 @@ use std::string::String;
 use rocket::request::Form;
 use crate::client_url::ClientUrl;
 use rocket::Request;
-use crate::preprocessor_simple_sdk_client_json::process_request;
 use rocket::request::FromRequest;
 use rocket::request::Outcome;
 use crate::response::response_invalid_param;
 use crate::response::BaseState;
 use bussiness_code::*;
-
+use crate::response::SimpleSdkResponse;
 mod preprocessor_simple_sdk_client_json;
 mod client_url;
 mod response;
 mod request;
 mod common_util;
 mod bussiness_code;
+mod simple_sdk_validator;
 
 
 /**
@@ -60,7 +60,7 @@ fn client_dispatcher(
     };
 
     //body处理
-    let request = match process_request(&service_name, &body, now, &http_request){
+    let request = match preprocessor_simple_sdk_client_json::process_request(&service_name, &body, now, &http_request){
         Ok(request) => {
             request
         },
@@ -69,10 +69,19 @@ fn client_dispatcher(
         },
     };
 
+    let mut response = SimpleSdkResponse::new_repsonse(format!("{}", now));
+    //校验请求体
+    preprocessor_simple_sdk_client_json::processing(&request, &mut response);
+    if response.get_state().get_code() != SUCCESS.code {
+        return Ok(response_invalid_param(&service_name,
+                                         now,
+                                         None,
+                                         BaseState::new_state_with_all_param(response.get_state().get_code(), response.get_state().get_msg(), response.get_state().get_desc(), response.get_state().get_sub_code())));
+    }
+
+
 
     //let request: SimpleSdkRequest = serde_json::from_str(body.as_str()).unwrap();
-
-
 
     //let response = SimpleSdkResponse::new_repsonse();
     //let result = serde_json::to_value(response)?;

@@ -61,6 +61,31 @@ impl<'a> BaseState<'a> {
             sub_code,
         }
     }
+
+    pub fn set_code(&mut self, code: i32) {
+        self.code = code;
+    }
+    pub fn get_code(&self) -> i32 {
+        self.code
+    }
+    pub fn get_sub_code(&self) -> i32 {
+        self.sub_code
+    }
+    pub fn set_sub_code(&mut self, sub_code: i32) {
+        self.sub_code = sub_code;
+    }
+    pub fn get_msg(&self) -> &'a str {
+        self.msg
+    }
+    pub fn set_msg(&mut self, msg: &'a str) {
+        self.msg = msg;
+    }
+    pub fn get_desc(&self) -> &'a str {
+        self.desc
+    }
+    pub fn set_desc(&mut self, desc: &'a str) {
+        self.desc = desc;
+    }
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -89,8 +114,28 @@ impl<'a> SimpleSdkResponse<'a> {
         }
     }
 
+    pub fn get_state(&self) -> &BaseState<'a> {
+        &self.state
+    }
+
+    pub fn set_state(&mut self, state: BaseState<'a>) {
+        self.state = state;
+    }
+
     pub fn set_data(&mut self, data_map: HashMap<String, Value>) {
         self.data = data_map;
+    }
+
+    pub fn get_data(&self) -> &HashMap<String, Value> {
+        &self.data
+    }
+
+    pub fn set_id(&mut self, id: String) {
+        self.id = id;
+    }
+
+    pub fn get_id(&self) -> &String {
+        &self.id
     }
 }
 
