@@ -1,3 +1,3 @@
 
 
-# 基于rust rocket.rs的通知http接口封装
+# 基于rust rocket.rs的通用http接口封装
