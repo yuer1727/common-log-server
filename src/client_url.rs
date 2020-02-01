@@ -56,4 +56,20 @@ impl ClientUrl {
 
         return None;
     }
+
+    pub fn to_string(&self) -> String{
+        let mut s = String::from("[service=");
+        s.push_str( self.service.as_ref().unwrap().as_str());
+        s.push_str(", ver=");
+        s.push_str(self.ver.as_str());
+        s.push_str(", os=");
+        s.push_str(self.os.as_str());
+        s.push_str(", df=");
+        s.push_str(self.df.as_str());
+        s.push_str(", cver=");
+        s.push_str(self.cver.as_str());
+        s.push_str("]");
+
+        return s;
+    }
 }

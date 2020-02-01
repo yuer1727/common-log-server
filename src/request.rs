@@ -138,7 +138,7 @@ impl Default for SimpleSdkRequest {
             service: "".to_string(),
             client: Some(Default::default()),
             data: Some(HashMap::new()),
-            ver: "".to_string(),
+            ver: "1.0".to_string(),
             ip: "".to_string(),
             port: "".to_string(),
             from: "".to_string(),
@@ -189,6 +189,9 @@ impl SimpleSdkRequest{
     pub fn get_ver(&self) -> &str {
         return self.ver.as_str()
     }
+    pub fn set_ver(&mut self, ver: String) {
+        self.ver = ver
+    }
     pub fn get_ip(&self) -> &str {
         return self.ip.as_str()
     }
@@ -213,8 +216,8 @@ impl SimpleSdkRequest{
     pub fn set_df(&mut self, df: String) {
         self.df = df
     }
-    pub fn get_start_time(&self) -> &u64 {
-        return &(self.start_time)
+    pub fn get_start_time(&self) -> u64 {
+        return self.start_time
     }
     pub fn set_start_time(&mut self, start_time: u64) {
         self.start_time = start_time

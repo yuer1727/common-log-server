@@ -2,6 +2,8 @@ use crate::request::SimpleSdkRequest;
 use crate::RocketRequest;
 use crate::response::SimpleSdkResponse;
 use crate::simple_sdk_validator::validate;
+use crate::response;
+use crate::response::BaseState;
 
 
 pub fn process_request(server_name: &String, body: &String, start_time: u64, http_request: &RocketRequest) -> Result<SimpleSdkRequest, String> {
@@ -17,6 +19,7 @@ pub fn process_request(server_name: &String, body: &String, start_time: u64, htt
     };
 
     sdk_request.set_service(server_name.clone());
+    sdk_request.set_ver(String::from("1.0"));
     sdk_request.set_from(String::from("cs"));
     sdk_request.set_df(String::from("json"));
     sdk_request.set_start_time(start_time);
@@ -31,5 +34,22 @@ pub fn processing(request: &SimpleSdkRequest, response: &mut SimpleSdkResponse) 
 
     validate(request, response);
 }
+
+
+pub fn convert_response(request: &SimpleSdkRequest, response: &SimpleSdkResponse) -> Result<String, String> {
+
+    //TODO 实现插件调用
+
+    //TODO 写accesslog
+
+    //响应结果
+    return Ok(response::response_invalid_param(&String::from(request.get_service()),
+                                     request.get_start_time(),
+                                     Some(request),
+                                     BaseState::new_state_with_all_param(response.get_state().get_code(), response.get_state().get_msg(), response.get_state().get_desc(), response.get_state().get_sub_code())));
+
+}
+
+
 
 

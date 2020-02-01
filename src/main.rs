@@ -13,6 +13,8 @@ use crate::response::response_invalid_param;
 use crate::response::BaseState;
 use bussiness_code::*;
 use crate::response::SimpleSdkResponse;
+use crate::service::service_common::get_service;
+
 mod preprocessor_simple_sdk_client_json;
 mod client_url;
 mod response;
@@ -20,6 +22,7 @@ mod request;
 mod common_util;
 mod bussiness_code;
 mod simple_sdk_validator;
+mod service;
 
 
 /**
@@ -60,7 +63,7 @@ fn client_dispatcher(
     };
 
     //body处理
-    let request = match preprocessor_simple_sdk_client_json::process_request(&service_name, &body, now, &http_request){
+    let mut request = match preprocessor_simple_sdk_client_json::process_request(&service_name, &body, now, &http_request){
         Ok(request) => {
             request
         },
@@ -73,21 +76,32 @@ fn client_dispatcher(
     //校验请求体
     preprocessor_simple_sdk_client_json::processing(&request, &mut response);
     if response.get_state().get_code() != SUCCESS.code {
-        return Ok(response_invalid_param(&service_name,
-                                         now,
-                                         None,
-                                         BaseState::new_state_with_all_param(response.get_state().get_code(), response.get_state().get_msg(), response.get_state().get_desc(), response.get_state().get_sub_code())));
+        return preprocessor_simple_sdk_client_json::convert_response(&request, &response);
     }
 
+    //记录url参数
+    request.set_url_param(client_url_params.to_string());
 
+    //获取业务处理方法
+    let service = match get_service(request.get_service(), client_url.ver.as_str()){
+        Some(service) => service,
+        None => {
+            return Ok(response_invalid_param(&service_name,
+                                             now,
+                                             Some(&request),
+                                             BaseState::new_state_with_param(INTERNAL_ERROR.code, INTERNAL_ERROR.msg, "接口未定义")));
+        }
+    };
 
-    //let request: SimpleSdkRequest = serde_json::from_str(body.as_str()).unwrap();
+    let response  = service.execute(&request);
 
-    //let response = SimpleSdkResponse::new_repsonse();
-    //let result = serde_json::to_value(response)?;
+    return preprocessor_simple_sdk_client_json::convert_response(&request, &response);
 
-    return Ok(format!("request, {:?} ", request));
-
+//    let result = match serde_json::to_string(&request) {
+//        Ok(result) => result,
+//        Err(_error) => "".to_string(),
+//    };
+//    return Ok(format!("request, {} ", result));
 
 
 }
