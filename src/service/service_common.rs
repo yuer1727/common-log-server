@@ -7,7 +7,7 @@ use crate::service::commmon_log_service::CommonLogService;
 use crate::service::commmon_log_service2::CommonLogService2;
 
 pub trait IService: Sync {
-    fn execute(&self, request: &SimpleSdkRequest) -> SimpleSdkResponse {
+    fn execute(&self, _request: &SimpleSdkRequest) -> SimpleSdkResponse {
         SimpleSdkResponse::new_repsonse_with_state(format!("{}", get_timestamp_millis()), BaseState::new_state())
     }
 }

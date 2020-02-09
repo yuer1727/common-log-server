@@ -27,7 +27,7 @@ static INTERNAL_ERROR: &'static str = r#"{
     })"#;
 
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BaseState<'a> {
     code: i32,
     msg: &'a str,
@@ -88,7 +88,7 @@ impl<'a> BaseState<'a> {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SimpleSdkResponse<'a> {
     id: String,
     #[serde(borrow)]

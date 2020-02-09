@@ -4,6 +4,7 @@ use crate::response::SimpleSdkResponse;
 use crate::simple_sdk_validator::validate;
 use crate::response;
 use crate::response::BaseState;
+use crate::simplelog::access_log;
 
 
 pub fn process_request(server_name: &String, body: &String, start_time: u64, http_request: &RocketRequest) -> Result<SimpleSdkRequest, String> {
@@ -36,11 +37,12 @@ pub fn processing(request: &SimpleSdkRequest, response: &mut SimpleSdkResponse) 
 }
 
 
-pub fn convert_response(request: &SimpleSdkRequest, response: &SimpleSdkResponse) -> Result<String, String> {
+pub fn convert_response(request: &SimpleSdkRequest, response: &SimpleSdkResponse<'static>) -> Result<String, String> {
 
     //TODO 实现插件调用
 
-    //TODO 写accesslog
+    //write accesslog
+    access_log::write_access_log(request.clone(), response.clone());
 
     //响应结果
     return Ok(response::response_invalid_param(&String::from(request.get_service()),
@@ -49,6 +51,8 @@ pub fn convert_response(request: &SimpleSdkRequest, response: &SimpleSdkResponse
                                      BaseState::new_state_with_all_param(response.get_state().get_code(), response.get_state().get_msg(), response.get_state().get_desc(), response.get_state().get_sub_code())));
 
 }
+
+
 
 
 

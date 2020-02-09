@@ -6,7 +6,7 @@ use crate::response::BaseState;
 
 
 impl IService for CommonLogService {
-    fn execute(&self, request: &SimpleSdkRequest) -> SimpleSdkResponse{
+    fn execute(&self, _request: &SimpleSdkRequest) -> SimpleSdkResponse{
         SimpleSdkResponse::new_repsonse_with_state(format!("{}", get_timestamp_millis()), BaseState::new_state())
     }
 }

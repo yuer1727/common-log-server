@@ -1,5 +1,5 @@
 [package]
-name = "common_util-log-server"
+name = "common_util-simplelog-server"
 version = "0.0.1"
 authors = ["yuer1727 <yuer1727@gmail.com>"]
 edition = "2018"
@@ -11,7 +11,9 @@ serde_json = "1.0.45"
 serde = { version = "1.0", features = ["derive"] }
 rocket_contrib = "0.4.2"
 chrono = "0.4"
-
+log = "0.4.8"
+log4rs = "0.10.0"
+threadpool = "1.7.1"
 
 
 

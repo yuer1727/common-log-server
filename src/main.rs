@@ -2,6 +2,8 @@
 
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate lazy_static;
+#[macro_use] extern crate log;
+extern crate log4rs;
 
 use std::string::String;
 use rocket::request::Form;
@@ -13,7 +15,8 @@ use crate::response::response_invalid_param;
 use crate::response::BaseState;
 use bussiness_code::*;
 use crate::response::SimpleSdkResponse;
-use crate::service::service_common::get_service;
+use crate::service::service_common;
+use common_util::string_common::string_to_static_str;
 
 mod preprocessor_simple_sdk_client_json;
 mod client_url;
@@ -23,6 +26,8 @@ mod common_util;
 mod bussiness_code;
 mod simple_sdk_validator;
 mod service;
+mod simplelog;
+mod simplethreadpool;
 
 
 /**
@@ -83,7 +88,7 @@ fn client_dispatcher(
     request.set_url_param(client_url_params.to_string());
 
     //获取业务处理方法
-    let service = match get_service(request.get_service(), client_url.ver.as_str()){
+    let service = match service_common::get_service(string_to_static_str(request.get_service()), string_to_static_str(client_url.ver.as_str()) ){
         Some(service) => service,
         None => {
             return Ok(response_invalid_param(&service_name,
@@ -96,12 +101,6 @@ fn client_dispatcher(
     let response  = service.execute(&request);
 
     return preprocessor_simple_sdk_client_json::convert_response(&request, &response);
-
-//    let result = match serde_json::to_string(&request) {
-//        Ok(result) => result,
-//        Err(_error) => "".to_string(),
-//    };
-//    return Ok(format!("request, {} ", result));
 
 
 }
@@ -134,9 +133,23 @@ impl<'a, 'r> FromRequest<'a, 'r> for RocketRequest {
     }
 }
 
+fn init_server() {
+
+    //doc: https://www.itread01.com/content/1548865473.html
+    match log4rs::init_file("conf/log4rs.yaml", Default::default()) {
+        Ok(config) => info!("init simplelog success: {:?}", config),
+        Err(error) => info!("init simplelog error: {:?}", error),
+    }
+}
 
 
 fn main() {
+    info!("222");
+    //初始化服务
+    init_server();
+    info!("1111");
     rocket::ignite().mount("/", routes![client_dispatcher]).launch();
+
+
 }
 
